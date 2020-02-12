@@ -61,7 +61,7 @@ def main():
       i += 1
       find_lawyers(url+str(i))
   
-  # print(lawyers)
+
   print('len', len(lawyers))
 
 main()
