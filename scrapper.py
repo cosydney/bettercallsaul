@@ -1,4 +1,6 @@
 from bs4 import BeautifulSoup
+import csv
+
 
 import requests
 
@@ -7,7 +9,7 @@ lawyers = []
 
 
 def find_lawyers(url):
-  print("called", url)
+  print('url', url)
   r  = requests.get(url)
   data = r.text
   soup = BeautifulSoup(data)
@@ -15,32 +17,51 @@ def find_lawyers(url):
     href = link.get('href')
     if href is not None:
       if 'annuaire/avocat' in href:
-        lawyers.append(href)
-        getLawyerInfo(href)
-        break
+        if href not in lawyers:
+          lawyers.append(href)
+          getLawyerInfo(href)
 
 def getLawyerInfo(url):
+  print("lawyer", url)
   r  = requests.get(url)
   data = r.text
   soup = BeautifulSoup(data)
-  name = soup.find("h1", {"class": "name-title"}).text
-  print('name', name)
-  email = soup.find("li", {"class": "email"}).text.replace('[kukac]', '@')
-  print('email', email)
-  tel = soup.find("li", {"class": "tel"}).text
-  print('tel', tel)
-  site = soup.find("li", {"class": "site"}).a.get('href')
-  print('site', site)
+  try:
+    name = soup.find("h1", {"class": "name-title"}).text.encode('utf-8')
+  except:
+    name = ''
 
+  try:
+    email = soup.find("li", {"class": "email"}).text.replace('[kukac]', '@').encode('utf-8')
+  except:
+    email = ""
+
+  try:
+    tel = soup.find("li", {"class": "tel"}).text.encode('utf-8')
+  except:
+    tel = ""
+  
+  try:
+    site = soup.find("li", {"class": "site"}).a.get('href').encode('utf-8')
+  except:
+    site = ""
+  
+  print('Lawyer', name, email, tel, site)
+  writeToCsv([name, email, tel, site])
+
+def writeToCsv(info):
+  with open('lawyer.csv', mode='a') as employee_file:
+        lawyer_writer = csv.writer(employee_file, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
+        lawyer_writer.writerow(info)
 
 
 def main(): 
-  i = 0
-  while i < 1:
+  i = 1
+  while i < 70:
       i += 1
       find_lawyers(url+str(i))
   
-  print(lawyers)
-  print(len(lawyers))
+  # print(lawyers)
+  print('len', len(lawyers))
 
 main()
