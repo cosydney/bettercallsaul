@@ -8,7 +8,7 @@ url = "https://www.avocat-immo.fr/annuaire/?is_avocat_immo=1&orderBy=nom%20ASC,%
 lawyers = []
 
 
-def find_lawyers(url):
+def find_lawyers_url(url):
   print('url', url)
   r  = requests.get(url)
   data = r.text
@@ -19,9 +19,9 @@ def find_lawyers(url):
       if 'annuaire/avocat' in href:
         if href not in lawyers:
           lawyers.append(href)
-          getLawyerInfo(href)
+          get_lawyer_info(href)
 
-def getLawyerInfo(url):
+def get_lawyer_info(url):
   print("lawyer", url)
   r  = requests.get(url)
   data = r.text
@@ -30,17 +30,14 @@ def getLawyerInfo(url):
     name = soup.find("h1", {"class": "name-title"}).text.encode('utf-8')
   except:
     name = ''
-
   try:
     email = soup.find("li", {"class": "email"}).text.replace('[kukac]', '@').encode('utf-8')
   except:
     email = ""
-
   try:
     tel = soup.find("li", {"class": "tel"}).text.encode('utf-8')
   except:
     tel = ""
-  
   try:
     site = soup.find("li", {"class": "site"}).a.get('href').encode('utf-8')
   except:
@@ -59,7 +56,7 @@ def main():
   i = 1
   while i < 70:
       i += 1
-      find_lawyers(url+str(i))
+      find_lawyers_url(url+str(i))
   
 
   print('len', len(lawyers))
